@@ -20,7 +20,7 @@ frame shape, not the topic name.
 From anywhere (e.g. the repo root) via the launcher — no install or `cd` needed:
 
 ```bash
-python3 tools/h5vid-exporter/run.py \
+python3 tools/h5vid-exporter/h5vid-export.py \
   --input /path/to/file.h5 \
   --topics cameras/head/color cameras/head/depth \
   --output out.mp4 \

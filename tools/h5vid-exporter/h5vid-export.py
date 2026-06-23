@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Standalone launcher: run h5vid-exporter from any directory without install.
 
-    python3 tools/h5vid-exporter/run.py --input FILE.h5 \
+    python3 tools/h5vid-exporter/h5vid-export.py --input FILE.h5 \
         --topics cameras/head/color cameras/head/depth --output out.mp4
 
 Adds this directory to sys.path so the ``h5vid_exporter`` package imports

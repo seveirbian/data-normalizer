@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-LAUNCHER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "run.py")
+LAUNCHER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "h5vid-export.py")
 
 
 def test_launcher_runs_from_unrelated_cwd(tiny_h5, tmp_path):
