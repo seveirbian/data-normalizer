@@ -64,8 +64,16 @@ tests/          # unit tests using a synthetic tiny h5 fixture
 README.md
 ```
 
-Dependencies added to the project: `h5py`, `numpy`, `opencv-python`,
-`imageio[ffmpeg]`.
+Dependencies added to the project: `h5py`, `numpy`, `opencv-python`.
+
+> **Encoder note (updated after environment probe):** the original plan was to
+> encode with `imageio[ffmpeg]` (libx264). Empirically, in this environment that
+> backend raises a repeatable `MemoryError` when writing multiple full-resolution
+> frames, while `cv2.VideoWriter` with the `mp4v` codec writes full-resolution
+> mp4 reliably and reads back correctly. We therefore encode with
+> `cv2.VideoWriter` (`mp4v`), which also removes the `imageio` dependency since
+> opencv already handles both decode and encode. Trade-off: `mp4v` (MPEG-4
+> Part 2) is slightly less modern than H.264 but is broadly playable.
 
 ### Component responsibilities
 
@@ -94,8 +102,10 @@ Dependencies added to the project: `h5py`, `numpy`, `opencv-python`,
 - Orchestrates: determines the frame range (see Frame alignment), and for each
   frame index reads + renders + composes all topics, then writes the frame via
   the encoder.
-- Encoding uses `imageio` with the ffmpeg backend (libx264) for reliable mp4
-  output independent of system codecs.
+- Encoding uses `cv2.VideoWriter` with the `mp4v` fourcc. The writer is opened
+  with the composed frame size (taken from frame 0) and the chosen fps. Composed
+  frames are RGB (render output); each frame is converted RGB→BGR before
+  writing, and padded to even width/height for codec safety.
 
 **cli.py**
 - Parses arguments and invokes the exporter.
