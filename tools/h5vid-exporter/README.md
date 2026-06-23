@@ -17,15 +17,25 @@ frame shape, not the topic name.
 
 ## Usage
 
-Run from this directory (`tools/h5vid-exporter/`):
+From anywhere (e.g. the repo root) via the launcher — no install or `cd` needed:
 
 ```bash
-python3 -m h5vid_exporter \
+python3 tools/h5vid-exporter/run.py \
   --input /path/to/file.h5 \
   --topics cameras/head/color cameras/head/depth \
   --output out.mp4 \
   --fps 30 \
   --height 480
+```
+
+Equivalent alternatives:
+
+```bash
+# As a module, with the package dir on PYTHONPATH:
+PYTHONPATH=tools/h5vid-exporter python3 -m h5vid_exporter --input ... --topics ... --output ...
+
+# Or from inside the tool directory:
+cd tools/h5vid-exporter && python3 -m h5vid_exporter --input ... --topics ... --output ...
 ```
 
 Options:
