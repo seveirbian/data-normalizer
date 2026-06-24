@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import open3d as o3d
 
-from .h5read import read_intrinsic, read_extrinsic, decode_image
+from .h5read import read_intrinsic, decode_image
 from .report import Verdict
 
 _AXIS_COMP = {"x": 0, "y": 1}
@@ -63,9 +63,8 @@ def _topdown(points, colors, out_path, forward_axis):
     cv2.imwrite(out_path, img)
 
 
-def run_depth_check(h5, cam, mount_link, kin, cfg, thresholds, forward_axis, frame, out_dir):
+def run_depth_check(h5, cam, mount_link, E, kin, cfg, thresholds, forward_axis, frame, out_dir):
     I = read_intrinsic(h5, cam)
-    E = read_extrinsic(h5, cam)
     depth = decode_image(h5, cam, "depth", frame)
     color = decode_image(h5, cam, "color", frame)
     H, W = depth.shape

@@ -14,9 +14,11 @@ an external JSON config (`configs/<robot>.json`).
   and check they land in front of the camera and within the frame. Artifact:
   `<cam>_overlay.png`.
 
-Intrinsics and extrinsics are read from the h5 (`parameters/camera/<cam>.json`);
-the config only names each camera's `mount_link`, `modality`, and (for color)
-`projection_targets`.
+Each camera's **extrinsic** is taken from the config's `extrinsic` field if
+present (so the checker validates the exact extrinsic downstream consumers use),
+otherwise it falls back to the h5 (`parameters/camera/<cam>.json`). **Intrinsics**
+are always read from the h5. The config names each camera's `mount_link`,
+`modality`, optional `projection_targets` (color), and optional `extrinsic`.
 
 ## Usage
 

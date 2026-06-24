@@ -2,8 +2,25 @@ import numpy as np
 
 from extrinsic_checker.h5read import (
     open_h5, read_intrinsic, read_extrinsic, decode_image,
-    read_frame_values, has_modality,
+    read_frame_values, has_modality, resolve_extrinsic,
 )
+
+
+def test_resolve_extrinsic_prefers_config(tiny_a2d_h5):
+    cam_cfg = {"extrinsic": {
+        "rotation_matrix": [[0, -1, 0], [1, 0, 0], [0, 0, 1]],
+        "translation_vector": [1.0, 2.0, 3.0],
+    }}
+    with open_h5(tiny_a2d_h5) as h5:
+        E = resolve_extrinsic(cam_cfg, h5, "head")
+    assert np.allclose(E[:3, 3], [1.0, 2.0, 3.0])
+    assert np.allclose(E[:3, :3], [[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+
+
+def test_resolve_extrinsic_falls_back_to_h5(tiny_a2d_h5):
+    with open_h5(tiny_a2d_h5) as h5:
+        E = resolve_extrinsic({"mount_link": "head_link2"}, h5, "head")
+    assert np.allclose(E, np.eye(4))   # fixture h5 extrinsic is identity
 
 
 def test_read_intrinsic(tiny_a2d_h5):
