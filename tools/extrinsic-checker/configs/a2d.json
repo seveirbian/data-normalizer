@@ -2,6 +2,12 @@
   "urdf": "../../../example-dataset/guodi/a2d/g1/g1_flat.urdf",
   "base_link": "base_link",
   "base_forward_axis": "-x",
+  "base_frame_axes": {
+    "_note": "base_link axis directions, validated via FK + depth reconstruction. Right-handed (x_hat x y_hat = z_hat); origin ~floor level. x points to the rear (unlike REP-103 x-forward). The arm_l link sits at +y, so the l/r arm naming is mirror-flipped vs the base frame (likely operator-facing perspective).",
+    "+x": "robot rear (forward is -x)",
+    "+y": "robot right",
+    "+z": "up"
+  },
   "joint_mapping": {
     "waist": {
       "h5_path": "joints/state/waist/position",
