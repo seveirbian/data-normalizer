@@ -31,5 +31,7 @@ class Kinematics:
 
     def link_transform(self, cfg, link):
         """Return T_base_link (4x4) for `link` expressed in base_link, given cfg."""
+        if link not in self.robot.link_map:
+            raise ValueError(f"link {link!r} not found in URDF")
         self.robot.update_cfg(cfg)
         return self.robot.get_transform(link, self.base_link)
