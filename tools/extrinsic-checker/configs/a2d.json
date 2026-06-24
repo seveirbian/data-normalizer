@@ -1,0 +1,54 @@
+{
+  "urdf": "../../../example-dataset/guodi/a2d/g1/g1_flat.urdf",
+  "base_link": "base_link",
+  "base_forward_axis": "-x",
+  "base_frame_axes": {
+    "_note": "base_link axis directions, validated via FK + depth reconstruction. Right-handed (x_hat x y_hat = z_hat); origin ~floor level. x points to the rear (unlike REP-103 x-forward). The arm_l link sits at +y, so the l/r arm naming is mirror-flipped vs the base frame (likely operator-facing perspective).",
+    "+x": "robot rear (forward is -x)",
+    "+y": "robot right",
+    "+z": "up"
+  },
+  "joint_mapping": {
+    "waist": {
+      "h5_path": "joints/state/waist/position",
+      "entries": [
+        {"h5_index": 0, "urdf_joint": "idx02_body_joint2", "sign": -1},
+        {"h5_index": 1, "urdf_joint": "idx01_body_joint1", "sign": 1}
+      ]
+    },
+    "head": {
+      "h5_path": "joints/state/head/position",
+      "entries": [
+        {"h5_index": 0, "urdf_joint": "idx11_head_joint1", "sign": 1},
+        {"h5_index": 1, "urdf_joint": "idx12_head_joint2", "sign": 1}
+      ]
+    },
+    "arm": {
+      "h5_path": "joints/state/arm/position",
+      "entries": [
+        {"h5_index": 0, "urdf_joint": "idx21_arm_l_joint1", "sign": 1},
+        {"h5_index": 1, "urdf_joint": "idx22_arm_l_joint2", "sign": 1},
+        {"h5_index": 2, "urdf_joint": "idx23_arm_l_joint3", "sign": 1},
+        {"h5_index": 3, "urdf_joint": "idx24_arm_l_joint4", "sign": 1},
+        {"h5_index": 4, "urdf_joint": "idx25_arm_l_joint5", "sign": 1},
+        {"h5_index": 5, "urdf_joint": "idx26_arm_l_joint6", "sign": 1},
+        {"h5_index": 6, "urdf_joint": "idx27_arm_l_joint7", "sign": 1},
+        {"h5_index": 7, "urdf_joint": "idx61_arm_r_joint1", "sign": 1},
+        {"h5_index": 8, "urdf_joint": "idx62_arm_r_joint2", "sign": 1},
+        {"h5_index": 9, "urdf_joint": "idx63_arm_r_joint3", "sign": 1},
+        {"h5_index": 10, "urdf_joint": "idx64_arm_r_joint4", "sign": 1},
+        {"h5_index": 11, "urdf_joint": "idx65_arm_r_joint5", "sign": 1},
+        {"h5_index": 12, "urdf_joint": "idx66_arm_r_joint6", "sign": 1},
+        {"h5_index": 13, "urdf_joint": "idx67_arm_r_joint7", "sign": 1}
+      ]
+    }
+  },
+  "cameras": {
+    "head": {"mount_link": "head_link2", "modality": "depth"},
+    "hand_left": {"mount_link": "arm_l_end_link", "modality": "color",
+                  "projection_targets": ["gripper_l_center_link"]},
+    "hand_right": {"mount_link": "arm_r_end_link", "modality": "color",
+                   "projection_targets": ["gripper_right_center_link"]}
+  },
+  "thresholds": {"plane_vertical_min": 0.85, "table_height_range": [0.3, 1.2]}
+}

@@ -1,0 +1,16 @@
+[project]
+name = "extrinsic-checker"
+version = "0.1.0"
+description = "Verify dataset camera extrinsics via base-frame reconstruction (depth point-cloud + color projection)."
+requires-python = ">=3.10"
+dependencies = ["open3d", "yourdfpy", "h5py", "opencv-python-headless", "numpy"]
+
+[project.scripts]
+extrinsic-check = "extrinsic_checker.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["extrinsic_checker"]
