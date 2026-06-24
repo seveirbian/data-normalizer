@@ -1,69 +1,52 @@
-# extrinsic-checker — Design
+# extrinsic-checker — 设计文档
 
-**Date:** 2026-06-24
-**Status:** Approved (design phase)
+**日期:** 2026-06-24
+**状态:** 已批准(设计阶段)
 
-## Purpose
+## 目的
 
-A tool that verifies camera extrinsics in a robot dataset are correct, by
-reconstructing what each camera sees into the robot base frame using the
-camera intrinsics/extrinsics plus forward kinematics from a URDF, and checking
-the result is geometrically sensible. Lives at `tools/extrinsic-checker/`.
+一个验证机器人数据集中**相机外参是否正确**的工具:用相机内参/外参 + URDF 正向运动学(FK),把每路相机看到的内容重建到机器人 base 坐标系,再检查重建结果在几何上是否合理。位于 `tools/extrinsic-checker/`。
 
-The package code is **platform-agnostic**; everything robot/dataset-specific
-lives in an external, self-contained JSON config passed via `--config`. An a2d
-config (`configs/a2d.json`) is provided, populated from the joint mapping and
-sign conventions already validated in earlier work.
+包代码**与平台无关**;所有机器人/数据集相关的信息都放在通过 `--config` 传入的**外部自包含 JSON 配置**里。随工具提供一份 a2d 配置(`configs/a2d.json`),其内容来自前期已验证的关节映射与符号约定。
 
-## Background (validated facts the a2d config encodes)
+## 背景(a2d 配置所编码的已验证事实)
 
-- Camera intrinsics and extrinsics come from the **h5 file**
-  (`parameters/camera/<cam>.json`: `intrinsic`, `extrinsic`). The config does
-  NOT carry these; it only names each camera's mount link and modality.
-- Extrinsic usage (validated on the a2d head camera): `E = [[R|t],[0,1]]` from
-  the JSON maps camera-optical-frame points into the mount-link frame, so
-  `T_base_cam = T_base_link @ E`. Camera optical frame is +x right / +y down /
-  +z forward (RealSense / open3d convention).
-- a2d FK quirks: h5 `joint_body_pitch` must be negated to match URDF
-  `idx02_body_joint2`; base_link forward axis is `-x`. The head camera looks
-  down at a tabletop.
-- a2d cameras: `head` has color+depth; `hand_left`/`hand_right` are color-only.
+- 相机内参和外参来自 **h5 文件**(`parameters/camera/<cam>.json` 的 `intrinsic`、`extrinsic`)。配置文件**不**携带这些,只标明每路相机的挂载连杆和模态。
+- 外参用法(已在 a2d head 相机上验证):JSON 里的 `E = [[R|t],[0,1]]` 把**相机光学系**的点变换到**挂载连杆系**,因此 `T_base_cam = T_base_link @ E`。相机光学系约定为 +x 右 / +y 下 / +z 前(RealSense / open3d 约定)。
+- a2d 的 FK 注意点:h5 的 `joint_body_pitch` 需**取负**才匹配 URDF 的 `idx02_body_joint2`;base_link 前向轴是 `-x`。head 相机俯视桌面。
+- a2d 相机:`head` 有 color+depth;`hand_left`/`hand_right` 只有 color。
 
-## Two validation methods (auto-selected by camera modality)
+## 两种验证方法(按相机模态自动选择)
 
-**Depth cameras → point-cloud reprojection.**
-Deproject depth with the intrinsic into a camera-frame cloud, transform to base
-via `T_base_cam`, fit the dominant plane (RANSAC), and judge:
-1. dominant plane is near-horizontal: `|n_z| >= plane_vertical_min`;
-2. plane height within `table_height_range`;
-3. cloud centroid lies on the robot's forward side (per `base_forward_axis`).
-PASS if all hold. Artifacts: base-frame colored PLY + top-down ortho PNG.
+**深度相机 → 点云反投法。**
+用内参把 depth 反投成相机系点云,经 `T_base_cam` 变换到 base 系,RANSAC 拟合主平面,判定:
+1. 主平面接近水平:`|n_z| >= plane_vertical_min`;
+2. 平面高度落在 `table_height_range` 内;
+3. 点云质心位于机器人前向一侧(由 `base_forward_axis` 决定)。
+三条全满足则 PASS。产物:base 系彩色 PLY + 俯视正交投影 PNG。
 
-**Color-only cameras → known-point projection.**
-For each configured target link (e.g. the same arm's gripper), take its origin
-in base from FK, transform into the camera frame (`p_cam = E^-1 @ T_base_link^-1
-@ p_base`), and project with the intrinsic (`u = fx*X/Z + cx`, `v = fy*Y/Z + cy`).
-Judge:
-1. point is in front of the camera: `Z > 0`;
-2. pixel falls within the image: `0 <= u < W and 0 <= v < H`.
-PASS if all target links hold. Artifact: RGB overlay PNG with projected markers.
+**纯彩色相机 → 已知点投影法。**
+对每个配置的目标连杆(如同臂夹爪),由 FK 取其在 base 系的原点,变换到相机系(`p_cam = E^-1 @ T_base_link^-1 @ p_base`),再用内参投影(`u = fx*X/Z + cx`,`v = fy*Y/Z + cy`)。判定:
+1. 点在相机前方:`Z > 0`;
+2. 像素落在图像内:`0 <= u < W 且 0 <= v < H`。
+所有目标连杆都满足则 PASS。产物:在该相机 RGB 上叠加投影标记的 overlay PNG。
 
-## Config schema (self-contained JSON)
+## 配置 schema(自包含 JSON)
 
 ```jsonc
 {
-  "urdf": "example-dataset/guodi/a2d/g1/g1_flat.urdf",  // path (resolved relative to config file dir, then cwd)
+  "urdf": "example-dataset/guodi/a2d/g1/g1_flat.urdf",  // 路径(先相对 config 文件目录解析,再相对 cwd)
   "base_link": "base_link",
-  "base_forward_axis": "-x",                            // one of +x,-x,+y,-y
+  "base_forward_axis": "-x",                            // 取值 +x,-x,+y,-y 之一
   "joint_mapping": {
-    "<group>": {
+    "<组名>": {
       "h5_path": "joints/state/waist/position",
       "entries": [
         {"h5_index": 0, "urdf_joint": "idx02_body_joint2", "sign": -1},
         {"h5_index": 1, "urdf_joint": "idx01_body_joint1", "sign": 1}
       ]
     }
-    // ... head, arm, etc. (state/robot floating base is NOT used — checks are in base_link frame)
+    // ... head、arm 等。(state/robot 浮动基不使用——所有检查都在 base_link 系内)
   },
   "cameras": {
     "head":       {"mount_link": "head_link2",     "modality": "depth"},
@@ -76,53 +59,38 @@ PASS if all target links hold. Artifact: RGB overlay PNG with projected markers.
 }
 ```
 
-`sign` defaults to 1 if omitted. `depth_scale` for the depth image is fixed at
-1000.0 (mm → m), standard for these RealSense streams.
+`sign` 缺省为 1。深度图的 `depth_scale` 固定为 1000.0(mm → m),这是这些 RealSense 流的标准。
 
-## Architecture
+## 架构
 
 ```
 tools/extrinsic-checker/
   extrinsic_checker/
-    loader.py            # load + validate config; resolve urdf path
-    kinematics.py        # yourdfpy wrapper: read h5 frame joints, build cfg (mapping+sign), T_base_link(link)
-    depth_check.py       # deproject + transform + RANSAC plane verdict; emit PLY + top-down PNG
-    projection_check.py  # project target-link points into the color image; emit overlay PNG
-    report.py            # Verdict dataclass + aggregation + printing
-    cli.py               # argparse: --config --input --camera --frame --out-dir; orchestrate; exit code
+    loader.py            # 加载并校验 config;解析 urdf 路径
+    kinematics.py        # yourdfpy 封装:读 h5 某帧关节,组装 cfg(映射+符号),取 T_base_link(link)
+    depth_check.py       # 反投 + 变换 + RANSAC 平面判定;输出 PLY + 俯视 PNG
+    projection_check.py  # 把目标连杆点投影到彩色图;输出 overlay PNG
+    report.py            # Verdict 数据类 + 汇总 + 打印
+    cli.py               # argparse: --config --input --camera --frame --out-dir;编排;退出码
     __main__.py
-  extrinsic_check.py      # standalone launcher (runs from any cwd, like h5vid-export.py)
+  extrinsic_check.py      # 独立启动器(任意 cwd 可跑,同 h5vid-export.py 风格)
   configs/
     a2d.json
   tests/
   README.md
-  pyproject.toml          # deps: open3d, yourdfpy, h5py, opencv-python-headless, numpy
+  pyproject.toml          # 依赖: open3d, yourdfpy, h5py, opencv-python-headless, numpy
 ```
 
-Run with the uv environment (Python 3.12), which has these deps installed.
+用 uv 环境(Python 3.12)运行,这些依赖已装好。
 
-### Component responsibilities
+### 各组件职责
 
-- **loader.py** — parse the JSON config, validate required keys and enum values
-  (`base_forward_axis`, `modality`), resolve `urdf` path (relative to the config
-  file directory, then cwd), raise clear errors on missing/invalid fields.
-- **kinematics.py** — load the URDF once via yourdfpy. `build_cfg(h5, frame,
-  joint_mapping)` reads each group's array at `frame`, applies `sign`, and
-  returns a `{urdf_joint: value}` dict (joints not mapped default to 0).
-  `link_transform(cfg, link)` returns `T_base_link` (`get_transform(link,
-  base_link)`).
-- **depth_check.py** — read the camera intrinsic + depth frame from the h5,
-  deproject with open3d, transform by `T_base_cam = T_base_link @ E`, RANSAC
-  `segment_plane`, compute the three criteria, return a Verdict; write the
-  base-frame colored PLY and a top-down orthographic PNG.
-- **projection_check.py** — read intrinsic + color frame; for each target link
-  compute `p_base` from FK, transform to camera frame, project; return a Verdict
-  with per-target (u,v,Z,in_image) detail; write the RGB overlay PNG.
-- **report.py** — `Verdict` dataclass (camera, method, passed, metrics dict,
-  artifacts list); aggregate and pretty-print; provide overall pass/fail.
-- **cli.py** — parse args; load config; open h5; for each requested camera pick
-  the method by modality and run it; print the report; exit non-zero if any
-  camera FAILs or errors.
+- **loader.py** — 解析 JSON 配置,校验必填键和枚举值(`base_forward_axis`、`modality`),解析 `urdf` 路径(先相对 config 文件目录,再相对 cwd),字段缺失/非法时报清晰错误。
+- **kinematics.py** — 用 yourdfpy 加载一次 URDF。`build_cfg(h5, frame, joint_mapping)` 读取每组在 `frame` 处的数组、应用 `sign`,返回 `{urdf_joint: value}` 字典(未映射的关节默认 0)。`link_transform(cfg, link)` 返回 `T_base_link`(`get_transform(link, base_link)`)。
+- **depth_check.py** — 从 h5 读该相机的内参 + depth 帧,用 open3d 反投,经 `T_base_cam = T_base_link @ E` 变换,RANSAC `segment_plane`,计算三条判据,返回 Verdict;写 base 系彩色 PLY 和俯视正交 PNG。
+- **projection_check.py** — 读内参 + color 帧;对每个目标连杆由 FK 算 `p_base`,变换到相机系并投影;返回带逐目标 (u,v,Z,in_image) 明细的 Verdict;写 RGB overlay PNG。
+- **report.py** — `Verdict` 数据类(camera、method、passed、metrics 字典、artifacts 列表);汇总并美化打印;给出总体通过/失败。
+- **cli.py** — 解析参数;加载 config;打开 h5;对每个请求的相机按模态选方法运行;打印报告;任一相机 FAIL 或报错则退出码非 0。
 
 ## CLI
 
@@ -130,38 +98,28 @@ Run with the uv environment (Python 3.12), which has these deps installed.
 python3 tools/extrinsic-checker/extrinsic_check.py \
     --config configs/a2d.json \
     --input  FILE.h5 \
-    [--camera head hand_left hand_right]   # default: all cameras in the config
-    [--frame 0]                            # default 0
-    [--out-dir DIR]                        # default: ./extrinsic_check_out
+    [--camera head hand_left hand_right]   # 默认:config 里的全部相机
+    [--frame 0]                            # 默认 0
+    [--out-dir DIR]                        # 默认: ./extrinsic_check_out
 ```
 
-Per camera: print the method, metrics, and PASS/FAIL. Exit 0 only if every
-checked camera passes.
+逐相机打印:方法、指标、PASS/FAIL。仅当所有被检相机都通过时退出码为 0。
 
-## Error handling
+## 错误处理
 
-- Config missing/invalid field, or unknown `base_forward_axis`/`modality` →
-  error naming the field.
-- Requested camera not in config, or its modality data absent in the h5 →
-  error listing available cameras / present modalities.
-- URDF file or a referenced link/joint not found → error naming it.
-- Joint array width at the frame shorter than a mapping `h5_index` → error.
+- 配置字段缺失/非法,或 `base_forward_axis`/`modality` 取值未知 → 报错并指出字段。
+- 请求的相机不在 config 中,或其模态数据在 h5 中不存在 → 报错并列出可用相机 / 现有模态。
+- URDF 文件或被引用的 link/joint 找不到 → 报错并指出名称。
+- 某帧的关节数组宽度小于映射的 `h5_index` → 报错。
 
-## Testing (TDD)
+## 测试(TDD)
 
-Pure-function unit tests (synthetic inputs, no large files):
-- **loader**: valid config parses; missing key / bad enum raises.
-- **kinematics.build_cfg**: array + mapping + signs → expected cfg dict (incl.
-  sign negation and unmapped-joint defaulting to 0).
-- **depth_check verdict** (`plane_verdict(points, thresholds, forward_axis)`):
-  a synthetic horizontal plane PASSes; a vertical plane FAILs; a plane at wrong
-  height FAILs; centroid on the wrong side FAILs.
-- **projection_check** (`project_point(p_base, T_base_link, E, fx,fy,cx,cy,W,H)`):
-  with identity transforms a known point projects to the expected pixel; a point
-  behind the camera (Z<0) FAILs; an out-of-image point FAILs.
+纯函数单测(合成输入,不依赖大文件):
+- **loader**:合法配置能解析;缺键 / 枚举非法时报错。
+- **kinematics.build_cfg**:数组 + 映射 + 符号 → 期望的 cfg 字典(含符号取负、未映射关节默认 0)。
+- **depth_check 判定**(`plane_verdict(points, thresholds, forward_axis)`):合成水平面 PASS;竖直面 FAIL;高度错误的平面 FAIL;质心在错误一侧 FAIL。
+- **projection_check**(`project_point(p_base, T_base_link, E, fx,fy,cx,cy,W,H)`):单位变换下已知点投影到期望像素;相机后方的点(Z<0)FAIL;图像外的点 FAIL。
 
-Integration / smoke (use real files, run via uv):
-- **FK**: load `g1_flat.urdf`, apply the a2d head config at frame 0, assert
-  `head_link2` origin ≈ `[0.495, 0, 1.385]` (tolerance 1 cm).
-- **a2d head smoke**: run the depth check on the real a2d h5 head camera, assert
-  PASS and that the PLY + top-down PNG are written.
+集成 / 冒烟(用真实文件,经 uv 运行):
+- **FK**:加载 `g1_flat.urdf`,在 frame 0 套用 a2d head 配置,断言 `head_link2` 原点 ≈ `[0.495, 0, 1.385]`(容差 1 cm)。
+- **a2d head 冒烟**:对真实 a2d h5 的 head 相机跑深度检查,断言 PASS 且 PLY + 俯视 PNG 已写出。
