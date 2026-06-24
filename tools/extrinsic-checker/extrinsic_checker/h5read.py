@@ -23,12 +23,23 @@ def read_intrinsic(h5, cam):
     return _params(h5, cam)["intrinsic"]
 
 
-def read_extrinsic(h5, cam):
-    e = _params(h5, cam)["extrinsic"]
+def extrinsic_matrix(extr):
+    """Build a 4x4 E from a {rotation_matrix, translation_vector} dict."""
     E = np.eye(4)
-    E[:3, :3] = np.array(e["rotation_matrix"], float)
-    E[:3, 3] = np.array(e["translation_vector"], float)
+    E[:3, :3] = np.array(extr["rotation_matrix"], float)
+    E[:3, 3] = np.array(extr["translation_vector"], float)
     return E
+
+
+def read_extrinsic(h5, cam):
+    return extrinsic_matrix(_params(h5, cam)["extrinsic"])
+
+
+def resolve_extrinsic(cam_cfg, h5, cam):
+    """Prefer the camera's `extrinsic` from the config; fall back to the h5."""
+    if "extrinsic" in cam_cfg:
+        return extrinsic_matrix(cam_cfg["extrinsic"])
+    return read_extrinsic(h5, cam)
 
 
 def decode_image(h5, cam, modality, frame):

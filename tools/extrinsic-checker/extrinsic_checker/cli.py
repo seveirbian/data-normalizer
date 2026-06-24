@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from .loader import load_config
-from .h5read import open_h5, read_frame_values, has_modality
+from .h5read import open_h5, read_frame_values, has_modality, resolve_extrinsic
 from .kinematics import Kinematics, build_cfg
 from .depth_check import run_depth_check
 from .projection_check import run_projection_check
@@ -45,12 +45,13 @@ def main(argv=None):
                 if not has_modality(h5, cam, modality):
                     print(f"error: camera {cam!r} modality {modality!r} absent in h5", file=sys.stderr)
                     return 2
+                E = resolve_extrinsic(cc, h5, cam)
                 if modality == "depth":
-                    v = run_depth_check(h5, cam, cc["mount_link"], kin, jcfg,
+                    v = run_depth_check(h5, cam, cc["mount_link"], E, kin, jcfg,
                                         cfg["thresholds"], cfg["base_forward_axis"],
                                         args.frame, args.out_dir)
                 else:
-                    v = run_projection_check(h5, cam, cc["mount_link"],
+                    v = run_projection_check(h5, cam, cc["mount_link"], E,
                                              cc.get("projection_targets", []), kin, jcfg,
                                              args.frame, args.out_dir)
                 verdicts.append(v)

@@ -5,7 +5,7 @@ import os
 import cv2
 import numpy as np
 
-from .h5read import read_intrinsic, read_extrinsic, decode_image
+from .h5read import read_intrinsic, decode_image
 from .report import Verdict
 
 
@@ -29,9 +29,8 @@ def project_point(p_base, T_base_link, E, fx, fy, cx, cy, W, H):
             "in_front": in_front, "in_image": in_image}
 
 
-def run_projection_check(h5, cam, mount_link, targets, kin, cfg, frame, out_dir):
+def run_projection_check(h5, cam, mount_link, E, targets, kin, cfg, frame, out_dir):
     I = read_intrinsic(h5, cam)
-    E = read_extrinsic(h5, cam)
     color = decode_image(h5, cam, "color", frame)
     H, W = color.shape[:2]
     T_base_link = kin.link_transform(cfg, mount_link)
