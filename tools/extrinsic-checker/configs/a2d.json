@@ -44,11 +44,33 @@
     }
   },
   "cameras": {
-    "head": {"mount_link": "head_link2", "modality": "depth"},
-    "hand_left": {"mount_link": "arm_l_end_link", "modality": "color",
-                  "projection_targets": ["gripper_l_center_link"]},
-    "hand_right": {"mount_link": "arm_r_end_link", "modality": "color",
-                   "projection_targets": ["gripper_right_center_link"]}
+    "head": {
+      "mount_link": "head_link2",
+      "modality": "depth",
+      "extrinsic": {
+        "rotation_matrix": [[-0.0069861770248138555, 0.02029780795996288, -0.9997695696122174], [-0.0036124667532492034, -0.9997879565509298, -0.020272938111510555], [-0.9999690712289729, 0.003470003996674296, 0.007058020808160648]],
+        "translation_vector": [-0.08149966200246173, 0.038757164296982845, -0.011918301395948858]
+      }
+    },
+    "hand_left": {
+      "mount_link": "arm_l_end_link",
+      "modality": "color",
+      "projection_targets": ["gripper_l_center_link"],
+      "extrinsic": {
+        "rotation_matrix": [[0.8523898267701582, -0.4702118332055764, -0.2287627922809802], [0.5228299180867078, 0.7738835323495892, 0.3574257337008193], [0.00896994828224992, -0.42427009118198944, 0.9054912643180166]],
+        "translation_vector": [0.026902772729325057, -0.05238394179478759, 0.0448980849577389]
+      }
+    },
+    "hand_right": {
+      "mount_link": "arm_r_end_link",
+      "modality": "color",
+      "projection_targets": ["gripper_right_center_link"],
+      "extrinsic": {
+        "rotation_matrix": [[0.8635642120745926, 0.45148563195563496, 0.2245385841266686], [-0.5042116668108338, 0.7778033798871753, 0.37522326325526134], [-0.005238957513546516, -0.43724435545093937, 0.899327485930717]],
+        "translation_vector": [-0.04359605326565453, -0.05127881644128651, 0.05391487976623609]
+      }
+    }
   },
+  "_extrinsic_note": "Per-camera extrinsic E = [[R|t],[0,1]] maps camera-optical-frame points into the mount_link frame: T_base_cam = T_base_link @ E. Copied from the source h5 parameters/camera/*.json. NOTE: the extrinsic-checker tool currently reads E from the h5 at runtime, not from here; these are stored for downstream use (e.g. adding camera poses to states).",
   "thresholds": {"plane_vertical_min": 0.85, "table_height_range": [0.3, 1.2]}
 }
