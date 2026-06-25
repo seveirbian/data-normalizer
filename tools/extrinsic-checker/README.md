@@ -26,7 +26,7 @@ Run from the repo root with the uv environment:
 
 ```bash
 uv run python tools/extrinsic-checker/extrinsic_check.py \
-  --config tools/extrinsic-checker/configs/a2d.json \
+  --config tools/configs/a2d.json \
   --input  /path/to/file.h5 \
   [--camera head hand_left hand_right] \
   [--frame 0] \
@@ -37,7 +37,8 @@ Exit code is 0 only if every checked camera passes.
 
 ## Config schema
 
-See `configs/a2d.json`. Keys: `urdf`, `base_link`, `base_forward_axis`
+See `tools/configs/a2d.json` (shared config dir for all tools). Keys: `urdf`,
+`base_link`, `base_forward_axis`
 (`+x/-x/+y/-y`), `joint_mapping` (per group: `h5_path` + `entries` of
 `{h5_index, urdf_joint, sign}`), `cameras` (per camera: `mount_link`,
 `modality`, optional `projection_targets`), `thresholds`

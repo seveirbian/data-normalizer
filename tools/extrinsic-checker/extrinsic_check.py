@@ -2,7 +2,7 @@
 """Standalone launcher: run extrinsic-checker from any directory without install.
 
     uv run python tools/extrinsic-checker/extrinsic_check.py \
-        --config tools/extrinsic-checker/configs/a2d.json --input FILE.h5
+        --config tools/configs/a2d.json --input FILE.h5
 
 Adds this directory to sys.path so the ``extrinsic_checker`` package imports
 regardless of the current working directory.
