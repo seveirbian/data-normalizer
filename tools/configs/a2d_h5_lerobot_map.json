@@ -1,0 +1,74 @@
+{
+  "robot": "a2d",
+  "description": "Per-dimension field mapping between the a2d h5 recording and its LeRobot v3 conversion, grouped by LeRobot feature. Each feature maps to a list of components; a vector component maps ONE scalar (lerobot_index + name) to ONE h5 element (h5_path + h5_index); an image feature has a single component with just its h5 stream path. Verified value-for-value against frame 0 (identity concatenation). Chain key for kinematics: (h5_path, h5_index), shared with the URDF joint_mapping in a2d.json. Reusable by the h5->lerobot converter and by tools tracing a LeRobot column to its h5 source.",
+  "features": {
+    "observation.state": [
+      {"lerobot_index":  0, "name": "left_arm_joint1",     "h5_path": "joints/state/arm/position",             "h5_index": 0},
+      {"lerobot_index":  1, "name": "left_arm_joint2",     "h5_path": "joints/state/arm/position",             "h5_index": 1},
+      {"lerobot_index":  2, "name": "left_arm_joint3",     "h5_path": "joints/state/arm/position",             "h5_index": 2},
+      {"lerobot_index":  3, "name": "left_arm_joint4",     "h5_path": "joints/state/arm/position",             "h5_index": 3},
+      {"lerobot_index":  4, "name": "left_arm_joint5",     "h5_path": "joints/state/arm/position",             "h5_index": 4},
+      {"lerobot_index":  5, "name": "left_arm_joint6",     "h5_path": "joints/state/arm/position",             "h5_index": 5},
+      {"lerobot_index":  6, "name": "left_arm_joint7",     "h5_path": "joints/state/arm/position",             "h5_index": 6},
+      {"lerobot_index":  7, "name": "right_arm_joint1",    "h5_path": "joints/state/arm/position",             "h5_index": 7},
+      {"lerobot_index":  8, "name": "right_arm_joint2",    "h5_path": "joints/state/arm/position",             "h5_index": 8},
+      {"lerobot_index":  9, "name": "right_arm_joint3",    "h5_path": "joints/state/arm/position",             "h5_index": 9},
+      {"lerobot_index": 10, "name": "right_arm_joint4",    "h5_path": "joints/state/arm/position",             "h5_index": 10},
+      {"lerobot_index": 11, "name": "right_arm_joint5",    "h5_path": "joints/state/arm/position",             "h5_index": 11},
+      {"lerobot_index": 12, "name": "right_arm_joint6",    "h5_path": "joints/state/arm/position",             "h5_index": 12},
+      {"lerobot_index": 13, "name": "right_arm_joint7",    "h5_path": "joints/state/arm/position",             "h5_index": 13},
+      {"lerobot_index": 14, "name": "left_gripper_joint1", "h5_path": "joints/state/effector/position",        "h5_index": 0},
+      {"lerobot_index": 15, "name": "right_gripper_joint1", "h5_path": "joints/state/effector/position",        "h5_index": 1},
+      {"lerobot_index": 16, "name": "joint_head_yaw",      "h5_path": "joints/state/head/position",            "h5_index": 0},
+      {"lerobot_index": 17, "name": "joint_head_pitch",    "h5_path": "joints/state/head/position",            "h5_index": 1},
+      {"lerobot_index": 18, "name": "joint_body_pitch",    "h5_path": "joints/state/waist/position",           "h5_index": 0},
+      {"lerobot_index": 19, "name": "joint_lift_body",     "h5_path": "joints/state/waist/position",           "h5_index": 1},
+      {"lerobot_index": 20, "name": "base_pos_x",          "h5_path": "joints/state/robot/position",           "h5_index": 0},
+      {"lerobot_index": 21, "name": "base_pos_y",          "h5_path": "joints/state/robot/position",           "h5_index": 1},
+      {"lerobot_index": 22, "name": "base_pos_z",          "h5_path": "joints/state/robot/position",           "h5_index": 2},
+      {"lerobot_index": 23, "name": "base_ori_x",          "h5_path": "joints/state/robot/orientation",        "h5_index": 0},
+      {"lerobot_index": 24, "name": "base_ori_y",          "h5_path": "joints/state/robot/orientation",        "h5_index": 1},
+      {"lerobot_index": 25, "name": "base_ori_z",          "h5_path": "joints/state/robot/orientation",        "h5_index": 2},
+      {"lerobot_index": 26, "name": "base_ori_w",          "h5_path": "joints/state/robot/orientation",        "h5_index": 3}
+    ],
+    "action": [
+      {"lerobot_index":  0, "name": "left_arm_joint1",     "h5_path": "joints/action/arm/position",            "h5_index": 0},
+      {"lerobot_index":  1, "name": "left_arm_joint2",     "h5_path": "joints/action/arm/position",            "h5_index": 1},
+      {"lerobot_index":  2, "name": "left_arm_joint3",     "h5_path": "joints/action/arm/position",            "h5_index": 2},
+      {"lerobot_index":  3, "name": "left_arm_joint4",     "h5_path": "joints/action/arm/position",            "h5_index": 3},
+      {"lerobot_index":  4, "name": "left_arm_joint5",     "h5_path": "joints/action/arm/position",            "h5_index": 4},
+      {"lerobot_index":  5, "name": "left_arm_joint6",     "h5_path": "joints/action/arm/position",            "h5_index": 5},
+      {"lerobot_index":  6, "name": "left_arm_joint7",     "h5_path": "joints/action/arm/position",            "h5_index": 6},
+      {"lerobot_index":  7, "name": "right_arm_joint1",    "h5_path": "joints/action/arm/position",            "h5_index": 7},
+      {"lerobot_index":  8, "name": "right_arm_joint2",    "h5_path": "joints/action/arm/position",            "h5_index": 8},
+      {"lerobot_index":  9, "name": "right_arm_joint3",    "h5_path": "joints/action/arm/position",            "h5_index": 9},
+      {"lerobot_index": 10, "name": "right_arm_joint4",    "h5_path": "joints/action/arm/position",            "h5_index": 10},
+      {"lerobot_index": 11, "name": "right_arm_joint5",    "h5_path": "joints/action/arm/position",            "h5_index": 11},
+      {"lerobot_index": 12, "name": "right_arm_joint6",    "h5_path": "joints/action/arm/position",            "h5_index": 12},
+      {"lerobot_index": 13, "name": "right_arm_joint7",    "h5_path": "joints/action/arm/position",            "h5_index": 13},
+      {"lerobot_index": 14, "name": "left_gripper_joint1", "h5_path": "joints/action/effector/position",       "h5_index": 0},
+      {"lerobot_index": 15, "name": "right_gripper_joint1", "h5_path": "joints/action/effector/position",       "h5_index": 1},
+      {"lerobot_index": 16, "name": "joint_head_yaw",      "h5_path": "joints/action/head/position",           "h5_index": 0},
+      {"lerobot_index": 17, "name": "joint_head_pitch",    "h5_path": "joints/action/head/position",           "h5_index": 1},
+      {"lerobot_index": 18, "name": "joint_body_pitch",    "h5_path": "joints/action/waist/position",          "h5_index": 0},
+      {"lerobot_index": 19, "name": "joint_lift_body",     "h5_path": "joints/action/waist/position",          "h5_index": 1},
+      {"lerobot_index": 20, "name": "base_cmd_pos_x",      "h5_path": "joints/action/robot/position",          "h5_index": 0},
+      {"lerobot_index": 21, "name": "base_cmd_pos_y",      "h5_path": "joints/action/robot/position",          "h5_index": 1},
+      {"lerobot_index": 22, "name": "base_cmd_pos_z",      "h5_path": "joints/action/robot/position",          "h5_index": 2},
+      {"lerobot_index": 23, "name": "base_cmd_vel_x",      "h5_path": "joints/action/robot/velocity",          "h5_index": 0},
+      {"lerobot_index": 24, "name": "base_cmd_vel_y",      "h5_path": "joints/action/robot/velocity",          "h5_index": 1}
+    ],
+    "observation.images.head": [
+      {"h5_path": "cameras/head/color"}
+    ],
+    "observation.images.head_depth": [
+      {"h5_path": "cameras/head/depth"}
+    ],
+    "observation.images.hand_left": [
+      {"h5_path": "cameras/hand_left/color"}
+    ],
+    "observation.images.hand_right": [
+      {"h5_path": "cameras/hand_right/color"}
+    ]
+  }
+}

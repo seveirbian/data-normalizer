@@ -1,5 +1,5 @@
 {
-  "urdf": "../../../example-dataset/guodi/a2d/g1/g1_flat.urdf",
+  "urdf": "../../example-dataset/guodi/a2d/g1/g1_flat.urdf",
   "base_link": "base_link",
   "base_forward_axis": "-x",
   "base_frame_axes": {
