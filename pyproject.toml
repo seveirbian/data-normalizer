@@ -10,6 +10,7 @@ dependencies = [
     "opencv-python-headless>=4.13.0.92",
     "pandas>=2.0.0",
     "pyarrow>=14.0.0",
+    "pyglet<2",
     "yourdfpy>=0.0.60",
 ]
 
