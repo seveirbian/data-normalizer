@@ -14,9 +14,22 @@ dependencies = [
     "pyarrow>=14.0.0",
     "pyglet<2",
     "pytest>=9.1.1",
+    "torch>=2.5.1",
     "tqdm>=4.68.3",
+    "transformers>=5.15.0",
     "yourdfpy>=0.0.60",
 ]
 
 [[tool.uv.index]]
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu121" }]
+
+[tool.uv]
+environments = ["sys_platform == 'linux'"]

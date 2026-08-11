@@ -22,3 +22,7 @@ class Frames:
     hand_world_landmarks: np.ndarray | None = None  # (T, 2, 21, 3) 米制 3D 坐标(以手腕为原点),缺失为 NaN
     handedness: np.ndarray | None = None  # (T, 2) 'Left'/'Right'/'',缺失为 ''
     handedness_score: np.ndarray | None = None  # (T, 2) float,缺失为 NaN
+
+    # steps.detect_objects 写入;跑之前保持 None
+    # 长度为 T 的 list,每帧一个 list[dict],每个 dict: {"box": (x1,y1,x2,y2) 像素坐标, "label": str, "score": float}
+    detected_objects: list[list[dict]] | None = None

@@ -1,4 +1,4 @@
-"""示例:读一段真实 ego 视频,跑手部检测,把关键点叠加输出成新视频。
+"""示例:读一段真实 ego 视频,跑手部检测+物体检测,把结果叠加输出成新视频。
 
 运行(从仓库根): uv run -m tools.ego_pipe.examples.demo_hand_overlay
 """
@@ -10,6 +10,7 @@ from tools.ego_pipe.io.write_video import write_video
 from tools.ego_pipe.log import configure_logging
 from tools.ego_pipe.pipe.pipeline import Pipeline
 from tools.ego_pipe.steps.detect_hands import detect_hands
+from tools.ego_pipe.steps.detect_objects import detect_objects
 
 VIDEO_PATH = (
     "/mnt/sfs_turbo/datasets-00573080/raw/Kupas-lerobot/paxini/Ego单目/Ego单目/"
@@ -24,8 +25,8 @@ def main() -> None:
     configure_logging()
 
     frames = read_video(VIDEO_PATH)
-    Pipeline([detect_hands]).run(frames)
-    write_video(frames, OUTPUT_PATH)
+    Pipeline([detect_hands, detect_objects]).run(frames)
+    write_video(frames, OUTPUT_PATH, draw_hands=True, draw_objects=True)
 
 
 if __name__ == "__main__":
