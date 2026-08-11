@@ -2,3 +2,6 @@ example-dataset
 example/data
 example/urdf
 *__pycache__*
+tools/ego_pipe/assets/
+tools/ego_pipe/steps/tests/fixtures/
+tools/ego_pipe/examples/output/
