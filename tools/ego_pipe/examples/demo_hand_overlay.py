@@ -11,6 +11,7 @@ from tools.ego_pipe.io.write_video import write_video
 from tools.ego_pipe.log import configure_logging
 from tools.ego_pipe.pipe.pipeline import Pipeline
 from tools.ego_pipe.steps.detect_objects import detect_objects
+from tools.ego_pipe.steps.detect_hands import detect_hands
 
 VIDEO_PATH = (
     "/mnt/sfs_turbo/datasets-00573080/raw/Kupas-lerobot/paxini/Ego单目/Ego单目/"
@@ -26,8 +27,8 @@ def main() -> None:
     configure_logging()
 
     frames = read_video(VIDEO_PATH)
-    Pipeline([detect_objects]).run(frames)
-    write_video(frames, OUTPUT_PATH, draw_hands=False, draw_objects=True)
+    Pipeline([detect_hands, detect_objects]).run(frames)
+    write_video(frames, OUTPUT_PATH, draw_hands=True, draw_objects=True)
     write_annotations(frames, ANNOTATIONS_PATH)
 
 

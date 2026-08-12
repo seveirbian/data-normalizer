@@ -18,6 +18,8 @@ class Frames:
     fourcc: str
 
     # steps.detect_hands 写入;跑之前保持 None
+    # 标准输出格式详见 steps/detect_hands.py 模块 docstring(21 个关键点索引含义、
+    # 归一化坐标 vs 世界坐标的区别);这里只记形状/槽位/缺失值。
     hand_landmarks: np.ndarray | None = None  # (T, 2, 21, 3) 归一化图像坐标,0=Left 1=Right,缺失为 NaN
     hand_world_landmarks: np.ndarray | None = None  # (T, 2, 21, 3) 米制 3D 坐标(以手腕为原点),缺失为 NaN
     handedness: np.ndarray | None = None  # (T, 2) 'Left'/'Right'/'',缺失为 ''
