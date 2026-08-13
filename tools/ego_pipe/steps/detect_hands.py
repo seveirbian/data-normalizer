@@ -18,13 +18,30 @@ MediaPipe HandLandmarker 的能力与限制:
 detect_objects 里 detected_objects 的 {"box", "label", "score"} 字典格式):
 - hand_landmarks: (T, 2, 21, 3) 图像归一化坐标 (x, y, z),x/y 相对图像宽高
   ∈ [0,1],z 是相对手腕的深度(与 x 同数量级,越小越靠近相机)。
-- hand_world_landmarks: (T, 2, 21, 3) 米制 3D 坐标,以手腕为原点,与相机
-  坐标系无关,不能直接做图像投影。
+- hand_world_landmarks: (T, 2, 21, 3) 米制 3D 坐标,原点是手掌几何中心
+  (MediaPipe 官方定义:"origin at the hand's geometric center",不是手腕)。
 - handedness: (T, 2) 'Left'/'Right'/''(未检测到)。
 - handedness_score: (T, 2) MediaPipe 给出的左右手分类置信度。
 - 以上 4 个数组第 2 维都是固定槽位 0=Left 1=Right;某手未检测到时该槽位
   在 landmarks/world_landmarks 里为 NaN,handedness 为空字符串,
   handedness_score 为 NaN。
+
+hand_landmarks vs hand_world_landmarks——两者回答的是完全不同的问题:
+- hand_landmarks 回答"手在画面里哪个位置":x/y 是手在**当前这一帧图像**里的
+  归一化像素位置,手在画面里左右移动、远近变化,会直接反映在 x/y 的变化上
+  (z 只是相对手腕的粗略深度,不是米制,不能反推真实距离)。但这是"手在 2D
+  画面里的位置",这段视频是移动的 ego 相机拍的,相机自己也在动,所以从这组
+  数据没法区分"是手在动"还是"是相机在动"。
+- hand_world_landmarks 回答"手指相对手掌怎么摆的"(articulation/shape),
+  不回答"手在空间里挪到哪了"(position/trajectory)。关键在于 MediaPipe 每一帧
+  都独立做一次"以这一帧检测到的手掌几何中心为原点"的坐标系重建——这个坐标系
+  是跟着手走的,不是固定在场景里的。举例:手指形状不变、整只手在真实空间里
+  平移了 30cm,frame 1 和 frame 100 里 hand_world_landmarks 会几乎完全一样,
+  因为两帧都各自把手掌重新归零到 (0,0,0) 了,平移这个信息在归零这一步就被
+  丢掉了,只剩下手指相对手掌的相对形状。
+- 所以拿 hand_world_landmarks 做可视化,只能看"某一瞬间手的姿态长什么样",
+  不能连起来看"手在场景里怎么移动的";真要后者,需要相机位姿(SLAM/VO)或者
+  换用 HaWoR 这类做全局重建的方法,不是这份数据能提供的。
 
 不含旋转信息:
 - HandLandmarkerResult 只有关键点位置(上面 4 个字段),没有 wrist/手掌的朝向
